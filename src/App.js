@@ -1,25 +1,55 @@
-import logo from './logo.svg';
+import React,{Component} from 'react';
+import Navigation from './components/navigation/Navigation';
+import Logo from './components/logo/logo';
+import ImageLinkForm from './components/imagelinkform/imagelinkform';
+import Rank from './components/rank/rank';
 import './App.css';
+import Particles from 'react-particles-js';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+
+const particleOptions ={
+  particles: {
+    number: {
+        value: 60
+    },
+    size: {
+        value: 2
+    }
+},
+}
+
+class App extends Component {
+  constructor(){
+    super();
+    this.state={
+      input:'',
+    }
+  }
+
+onInputChange =(event)=>{
+ console.log(event.target.value);
+}
+
+onButtonSubmit =()=>{
+  console.log('click');
+}
+
+
+  render(){
+    return (
+      <div className="App">
+        <Particles className='particles' 
+              params={particleOptions}
+            />
+      <Navigation/>
+      <Logo/> 
+      <Rank/>
+      <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit}/>
+         {/*
+        <FaceRecognition/>*/}
     </div>
   );
+}
 }
 
 export default App;
