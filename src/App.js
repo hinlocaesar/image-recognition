@@ -1,21 +1,22 @@
-import React,{Component} from 'react';
+import React, { Component } from 'react';
+import Particles from 'react-particles-js';
 import Clarifai from 'clarifai';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
-import Navigation from './components/navigation/Navigation';
-import Logo from './components/logo/logo';
-import ImageLinkForm from './components/imagelinkform/imagelinkform';
-import Rank from './components/rank/rank';
-import SignIn from './components/SignIn/SignIn';
+import Navigation from './components/Navigation/Navigation';
+import Signin from './components/Signin/Signin';
+import Register from './components/Register/Register';
+import Logo from './components/Logo/Logo';
+import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
+import Rank from './components/Rank/Rank';
 import './App.css';
-import Particles from 'react-particles-js';
 
 //You must add your own API key here from Clarifai.
 const app = new Clarifai.App({
- apiKey: 'fd5b9b8e471749deb7496353a206b00a'
+ apiKey: 'YOUR API KEY HERE'
 });
 
-const particleOptions ={
-   particles: {
+const particlesOptions = {
+  particles: {
     number: {
       value: 30,
       density: {
@@ -25,11 +26,12 @@ const particleOptions ={
     }
   }
 }
+
 class App extends Component {
-  constructor(){
+  constructor() {
     super();
-    this.state={
-      input:'',
+    this.state = {
+      input: '',
       imageUrl: '',
       box: {},
       route: 'signin',
@@ -42,6 +44,16 @@ class App extends Component {
         joined: ''
       }
     }
+  }
+
+  loadUser = (data) => {
+    this.setState({user: {
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined
+    }})
   }
 
   calculateFaceLocation = (data) => {
@@ -63,10 +75,6 @@ class App extends Component {
 
   onInputChange = (event) => {
     this.setState({input: event.target.value});
-  }
-
-  onRouteChange =()=>{
-    this.setState({route:'home'})
   }
 
   onButtonSubmit = () => {
@@ -105,31 +113,45 @@ class App extends Component {
       .catch(err => console.log(err));
   }
 
+  onRouteChange = (route) => {
+    if (route === 'signout') {
+      this.setState({isSignedIn: false})
+    } else if (route === 'home') {
+      this.setState({isSignedIn: true})
+    }
+    this.setState({route: route});
+  }
 
-  render(){
+  render() {
     const { isSignedIn, imageUrl, route, box } = this.state;
     return (
       <div className="App">
-        <Particles className='particles'params={particleOptions}/>
-        <Navigation/>
-        { this.state.route==='signin' 
-        ?<SignIn onRouteChange={this.onRouteChange}/>
-        :<div>
-          <Logo/> 
-          <Rank/>
-          <ImageLinkForm
-            onInputChange={this.onInputChange}
-            onButtonSubmit={this.onButtonSubmit}
-          />
-        <FaceRecognition box={box} imageUrl={imageUrl} />
-        </div>
-      }
-     
-     
-       
-    </div>
-  );
-}
+         <Particles className='particles'
+          params={particlesOptions}
+        />
+        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
+        { route === 'home'
+          ? <div>
+              <Logo />
+              <Rank
+                name={this.state.user.name}
+                entries={this.state.user.entries}
+              />
+              <ImageLinkForm
+                onInputChange={this.onInputChange}
+                onButtonSubmit={this.onButtonSubmit}
+              />
+              <FaceRecognition box={box} imageUrl={imageUrl} />
+            </div>
+          : (
+             route === 'signin'
+             ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+             : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+            )
+        }
+      </div>
+    );
+  }
 }
 
 export default App;
